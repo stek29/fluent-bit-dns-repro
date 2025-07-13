@@ -6,7 +6,7 @@ This is a minimal lab setup to reproduce and test IPv6 DNS resolution issues in 
 
 1.  **Start the environment:**
     ```bash
-    docker compose up -d
+    docker compose up -d --build
     ```
 
 2.  **Check the logs of the default fluent-bit instance (uses UDP for DNS):**
