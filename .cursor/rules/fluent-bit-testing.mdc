@@ -1,0 +1,25 @@
+---
+description: When testing Fluent Bit DNS resolution issues, always recreate the fluent-bit container to avoid reading older logs and ensure clean testing
+alwaysApply: false
+---
+# Fluent Bit Testing Procedures
+
+When testing Fluent Bit behavior, always recreate the fluent-bit container to avoid reading older logs:
+
+```bash
+docker compose up -d --force-recreate fluent-bit
+```
+
+This ensures:
+- Clean container state
+- No cached DNS resolutions
+- Fresh log output without previous test artifacts
+- Accurate reproduction of issues
+
+**Important**: If DNS configuration changes, also restart the DNS container:
+```bash
+docker compose restart dns
+docker compose up -d --force-recreate fluent-bit
+```
+
+This rule applies to testing scenarios in the [docker-compose.yml](mdc:docker-compose.yml) setup where DNS resolution issues are being investigated.

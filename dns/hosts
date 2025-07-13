@@ -1,0 +1,30 @@
+# Test hosts file with multiple IPv6 addresses
+# Using RFC 3849 documentation prefix (2001:db8::/32)
+# This simulates a scenario where DNS response might exceed 512 bytes
+
+# 3-records server with 3 IPv6 addresses (DNS response ~139 bytes, fluent-bit works)
+2001:db8::10 3-records.test.example.com
+2001:db8::11 3-records.test.example.com
+2001:db8::12 3-records.test.example.com
+
+# 20-records server with 20 IPv6 addresses (DNS response > 512 bytes, fluent-bit fails)
+2001:db8::10 20-records.test.example.com
+2001:db8::11 20-records.test.example.com
+2001:db8::12 20-records.test.example.com
+2001:db8::13 20-records.test.example.com
+2001:db8::14 20-records.test.example.com
+2001:db8::15 20-records.test.example.com
+2001:db8::16 20-records.test.example.com
+2001:db8::17 20-records.test.example.com
+2001:db8::18 20-records.test.example.com
+2001:db8::19 20-records.test.example.com
+2001:db8::20 20-records.test.example.com
+2001:db8::21 20-records.test.example.com
+2001:db8::22 20-records.test.example.com
+2001:db8::23 20-records.test.example.com
+2001:db8::24 20-records.test.example.com
+2001:db8::25 20-records.test.example.com
+2001:db8::26 20-records.test.example.com
+2001:db8::27 20-records.test.example.com
+2001:db8::28 20-records.test.example.com
+2001:db8::29 20-records.test.example.com
