@@ -4,6 +4,8 @@ This is a minimal lab setup to reproduce and test IPv6 DNS resolution issues in 
 
 ## TL;DR: Reproduce the bug
 
+### Option 1: Using Upstream Fluent Bit Image
+
 1.  **Start the environment:**
     ```bash
     docker compose up -d --build
@@ -25,6 +27,29 @@ This is a minimal lab setup to reproduce and test IPv6 DNS resolution issues in 
 4.  **Clean up:**
     ```bash
     docker compose down
+    ```
+
+### Option 2: Build Fluent Bit from Source
+
+1.  **Clone the Fluent Bit repository (if not already done):**
+    ```bash
+    git clone https://github.com/fluent/fluent-bit.git fluent-bit-source
+    ```
+
+2.  **Start the environment with source-built Fluent Bit:**
+    ```bash
+    docker compose -f docker-compose.yml -f docker-compose.source.yml up -d --build
+    ```
+
+3.  **Check the logs (same as above):**
+    ```bash
+    docker compose logs fluent-bit-default
+    docker compose logs fluent-bit-dns-tcp
+    ```
+
+4.  **Clean up:**
+    ```bash
+    docker compose -f docker-compose.yml -f docker-compose.source.yml down
     ```
 
 ## Problem Context
@@ -55,6 +80,8 @@ The original issue was encountered with fluent-bit's `kinesis_streams` plugin wh
 
 ## Quick Start
 
+### Using Upstream Fluent Bit Image
+
 1. **Start the lab**:
    ```bash
    docker compose up -d
@@ -84,6 +111,29 @@ The original issue was encountered with fluent-bit's `kinesis_streams` plugin wh
 4. **Check server logs**:
    ```bash
    docker compose logs server
+   ```
+
+### Using Source-Built Fluent Bit
+
+1. **Clone Fluent Bit repository** (if not already done):
+   ```bash
+   git clone https://github.com/fluent/fluent-bit.git fluent-bit-source
+   ```
+
+2. **Start the lab with source-built Fluent Bit**:
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.source.yml up -d --build
+   ```
+
+3. **Test and check logs** (same as above):
+   ```bash
+   # Test DNS resolution
+   dig @localhost -p 5453 3-records.test.example.com 
+   dig @localhost -p 5453 20-records.test.example.com AAAA
+   
+   # Check logs
+   docker compose logs fluent-bit-default
+   docker compose logs fluent-bit-dns-tcp
    ```
 
 ## Current Test Results
@@ -167,8 +217,17 @@ The configuration is now split into multiple files for clarity and to test diffe
 ## Testing Different Scenarios
 
 ### Test with current setup (always reproducible):
+
+**Using Upstream Image:**
 ```bash
 docker compose up -d
+docker compose logs fluent-bit-default
+docker compose logs fluent-bit-dns-tcp
+```
+
+**Using Source-Built Image:**
+```bash
+docker compose -f docker-compose.yml -f docker-compose.source.yml up -d --build
 docker compose logs fluent-bit-default
 docker compose logs fluent-bit-dns-tcp
 ```
@@ -198,23 +257,47 @@ dig @localhost -p 5453 20-records.test.example.com AAAA | grep "MSG SIZE"
 
 ## Cleanup
 
+### Using Upstream Image
 ```bash
 docker compose down
 ```
+
+### Using Source-Built Image
+```bash
+docker compose -f docker-compose.yml -f docker-compose.source.yml down
+```
+
+## Build Options
+
+This lab supports two ways to run Fluent Bit:
+
+1. **Upstream Image** (`docker-compose.yml`): Uses the official `fluent/fluent-bit:4.0.4` image
+   - Fast startup, no build time required
+   - Good for initial testing and reproduction
+   - Uses the exact version where the bug was discovered
+
+2. **Source Build** (`docker-compose.source.yml`): Builds Fluent Bit from source
+   - Requires cloning the Fluent Bit repository
+   - Longer initial build time
+   - Enables development and testing of fixes
+   - Uses the latest source code from the main branch
 
 ## Files Structure
 
 ```
 fluent-bit-dns-repro/
-├── docker-compose.yml          # Main orchestration
+├── docker-compose.yml              # Main orchestration (upstream image)
+├── docker-compose.source.yml       # Override for source-built Fluent Bit
+├── .gitignore                      # Excludes fluent-bit-source/ directory
 ├── dns/
-│   ├── dnsmasq.conf           # DNS server configuration
-│   └── hosts                  # Two hostnames: 3-records and 20-records
+│   ├── dnsmasq.conf               # DNS server configuration
+│   └── hosts                      # Two hostnames: 3-records and 20-records
 ├── server/
-│   └── nginx.conf             # Simple test server with IPv6 support
+│   └── nginx.conf                 # Simple test server with IPv6 support
 ├── fluent-bit/
-│   ├── common.conf              # Common input/output for both fluent-bit instances
-│   ├── fluent-bit-default.conf  # Config for default (UDP) DNS resolution
-│   └── fluent-bit-dns-tcp.conf  # Config for DNS over TCP resolution
-└── README.md                  # This file
+│   ├── common.conf                # Common input/output for both fluent-bit instances
+│   ├── fluent-bit-default.conf    # Config for default (UDP) DNS resolution
+│   └── fluent-bit-dns-tcp.conf    # Config for DNS over TCP resolution
+├── fluent-bit-source/             # Cloned Fluent Bit repository (gitignored)
+└── README.md                      # This file
 ``` 

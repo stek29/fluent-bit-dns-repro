@@ -1,0 +1,18 @@
+services:
+  fluent-bit-default:
+    extends:
+      file: docker-compose.base.yml
+      service: fluent-bit-default
+    build:
+      context: ./fluent-bit-source
+      dockerfile: dockerfiles/Dockerfile
+      target: production
+
+  fluent-bit-dns-tcp:
+    extends:
+      file: docker-compose.base.yml
+      service: fluent-bit-dns-tcp
+    build:
+      context: ./fluent-bit-source
+      dockerfile: dockerfiles/Dockerfile
+      target: production 

@@ -32,39 +32,17 @@ services:
     depends_on:
       - dns
 
-  # Docker Desktop can have issues correctly propagating the 'dns' option
-  # to containers, causing them to default to an internal resolver.
-  # To work around this, we mount a custom resolv.conf to force
-  # the fluent-bit containers to use our DNS service directly.
   fluent-bit-default:
+    extends:
+      file: docker-compose.base.yml
+      service: fluent-bit-default
     image: fluent/fluent-bit:4.0.4
-    volumes:
-      - ./fluent-bit:/fluent-bit/etc:ro
-      - ./fluent-bit/resolv.conf:/etc/resolv.conf:ro
-    command: -c /fluent-bit/etc/fluent-bit-default.conf
-    networks:
-      fluent-bit-lab:
-        ipv6_address: 2001:db8::100
-    depends_on:
-      - dns
-      - server
-    dns:
-      - 2001:db8::2
 
   fluent-bit-dns-tcp:
+    extends:
+      file: docker-compose.base.yml
+      service: fluent-bit-dns-tcp
     image: fluent/fluent-bit:4.0.4
-    volumes:
-      - ./fluent-bit:/fluent-bit/etc:ro
-      - ./fluent-bit/resolv.conf:/etc/resolv.conf:ro
-    command: -c /fluent-bit/etc/fluent-bit-dns-tcp.conf
-    networks:
-      fluent-bit-lab:
-        ipv6_address: 2001:db8::101
-    depends_on:
-      - dns
-      - server
-    dns:
-      - 2001:db8::2
 
 networks:
   fluent-bit-lab:
