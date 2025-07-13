@@ -53,9 +53,6 @@ services:
 
   fluent-bit-dns-tcp:
     image: fluent/fluent-bit:4.0.4
-    # The fluent/fluent-bit distroless image does not always respect the 'dns'
-    # option and defaults to Docker's internal resolver.
-    # We mount a custom resolv.conf to force it to use our DNS container.
     volumes:
       - ./fluent-bit:/fluent-bit/etc:ro
       - ./fluent-bit/resolv.conf:/etc/resolv.conf:ro
