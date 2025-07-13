@@ -2,6 +2,31 @@
 
 This is a minimal lab setup to reproduce and test IPv6 DNS resolution issues in fluent-bit when DNS responses contain many IPv6 addresses and exceed the 512-byte UDP limit.
 
+## TL;DR: Reproduce the bug
+
+1.  **Start the environment:**
+    ```bash
+    docker compose up -d
+    ```
+
+2.  **Check the logs of the default fluent-bit instance (uses UDP for DNS):**
+    ```bash
+    docker compose logs fluent-bit-default
+    ```
+    - ✅ You will see **successful** logs for `3-records.test.example.com`.
+    - ❌ You will see **DNS resolution errors** for `20-records.test.example.com`, because the DNS response is too large for UDP and fluent-bit doesn't fall back to TCP.
+
+3.  **Check the logs of the TCP-only fluent-bit instance:**
+    ```bash
+    docker compose logs fluent-bit-dns-tcp
+    ```
+    - ✅ You will see **successful** logs for both hostnames, as this instance is configured to use DNS over TCP.
+
+4.  **Clean up:**
+    ```bash
+    docker compose down
+    ```
+
 ## Problem Context
 
 The original issue was encountered with fluent-bit's `kinesis_streams` plugin when DNS responses for endpoints contained too many IPv6 addresses, causing the response to exceed the 512-byte UDP DNS limit. This lab provides a controlled environment to reproduce and test this issue.
