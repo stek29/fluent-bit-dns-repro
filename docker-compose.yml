@@ -51,9 +51,6 @@ services:
     dns:
       - 2001:db8::2
 
-    # The fluent/fluent-bit distroless image does not always respect the 'dns'
-    # option and defaults to Docker's internal resolver.
-    # We mount a custom resolv.conf to force it to use our DNS container.
   fluent-bit-dns-tcp:
     image: fluent/fluent-bit:4.0.4
     # The fluent/fluent-bit distroless image does not always respect the 'dns'
